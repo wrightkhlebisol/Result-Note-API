@@ -2,10 +2,10 @@
 
 from sqlalchemy.orm.mapper import configure_mappers
 
-from flaskstarter import create_app
-from flaskstarter.extensions import db
-from flaskstarter.user import Users, ADMIN, USER, ACTIVE
-from flaskstarter.tasks import MyTaskModel
+from resultnote import create_app
+from resultnote.extensions import db
+from resultnote.user import Users, ADMIN, USER, ACTIVE
+from resultnote.tasks import MyTaskModel
 
 application = create_app()
 
@@ -18,7 +18,7 @@ def initdb():
     configure_mappers()
     db.create_all()
 
-    admin = Users(name='Admin Flask-Starter',
+    admin = Users(name='Admin Result-Note',
                   email=u'admin@your-mail.com',
                   password=u'adminpassword',
                   role_code=ADMIN,

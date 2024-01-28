@@ -3,9 +3,9 @@
 import pytest
 
 from flask_login import current_user
-from flaskstarter import create_app
-from flaskstarter.extensions import db
-from flaskstarter.user import Users, USER, ACTIVE
+from resultnote import create_app
+from resultnote.extensions import db
+from resultnote.user import Users, USER, ACTIVE
 
 @pytest.fixture
 def client():

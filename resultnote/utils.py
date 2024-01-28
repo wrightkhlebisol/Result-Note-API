@@ -9,7 +9,7 @@ import datetime
 
 
 # Instance folder path, to keep stuff aware from flask app.
-INSTANCE_FOLDER_PATH = os.path.join('/tmp', 'flaskstarter-instance')
+INSTANCE_FOLDER_PATH = os.path.join('/tmp', 'resultnote-instance')
 
 
 # Form validation

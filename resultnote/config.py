@@ -8,12 +8,12 @@ from .utils import INSTANCE_FOLDER_PATH
 class BaseConfig(object):
     # Change these settings as per your needs
 
-    PROJECT = "flaskstarter"
-    PROJECT_NAME = "flaskstarter.domain"
+    PROJECT = "resultnote"
+    PROJECT_NAME = "resultnote.domain"
     PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-    BASE_URL = "https://yourdomain-flaskstarter.domain"
-    ADMIN_EMAILS = ['admin@flaskstarter.domain']
+    BASE_URL = "https://yourdomain-resultnote.domain"
+    ADMIN_EMAILS = ['admin@resultnote.domain']
 
     DEBUG = False
     TESTING = False
@@ -46,6 +46,6 @@ class DefaultConfig(BaseConfig):
     MAIL_USE_TLS = True
 
     # Keep these in instance folder or in env variables
-    MAIL_USERNAME = "admin-mail@yourdomain-flaskstarter.domain"
+    MAIL_USERNAME = "admin-mail@yourdomain-resultnote.domain"
     MAIL_PASSWORD = ""
     MAIL_DEFAULT_SENDER = MAIL_USERNAME
