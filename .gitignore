@@ -4,3 +4,4 @@ logs/
 migrations/
 app.db
 .env
+*.http
