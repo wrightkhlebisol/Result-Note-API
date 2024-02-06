@@ -35,7 +35,7 @@ def background_worker_count_seconds(number: int) -> tuple[Response, int] | Respo
     return jsonify({"msg": "Launched background task"}), 200
 
 
-@bp.get("/get/active-background-tasks")
+@bp.get("/active-background-tasks")
 @jwt_required()
 def active_background_tasks() -> tuple[Response, int] | str:
     """
@@ -50,7 +50,7 @@ def active_background_tasks() -> tuple[Response, int] | str:
     return tasks_schema.jsonify(tasks), 200
 
 
-@bp.get("/get/finished-background-tasks")
+@bp.get("/finished-background-tasks")
 @jwt_required()
 def finished_background_tasks() -> tuple[Response, int] | str:
     """
