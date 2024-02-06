@@ -36,7 +36,8 @@ class Users(db.Model):
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
     role = db.Column(db.Enum('super_admin', 'admin', 'student', 'teacher', 'parent', 'others'), nullable=False)
     birthday = db.Column(db.DateTime, nullable=False)
-    join_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
     def set_password(self, password: str):
@@ -132,38 +133,38 @@ class Users(db.Model):
         return Tasks.query.filter_by(user=self, complete=True).all()
 
 
-# class Schools(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     admin = db.Column(db.Integer, db.ForeignKey("users.id"))
-#     name = db.Column(db.String(100), nullable=False)
-#     location = db.Column(db.String(100), nullable=False)
-#     students = db.relationship("Users", backref="school", lazy="dynamic")
+# defines the Schools database table
+class Schools(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    color = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
        
     
-# class Classes(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(100), nullable=False)
-#     school_id = db.Column(db.Integer, db.ForeignKey("schools.id"))
-#     subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"))
-#     teacher_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-#     teacher = db.relationship("Users", backref="class", lazy="dynamic")
+# defines the Students database table
+class Classes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# defines the Subjects database table
+class Subjects(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
  
-    
-# class Subjects(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(100), nullable=False)
- 
 
-
-# class Scores(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     student_id = db.Column(db.Integer, db.ForeignKey("students.id"), on_delete="CASCADE")
-#     subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"))
-#     score = db.Column(db.Integer, nullable=False)
-#     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
-#     student = db.relationship("Students", backref="score", lazy="dynamic")
-#     subject = db.relationship("Subjects", backref="score", lazy="dynamic")
+# defines the Scores database table
+class Scores(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    score = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class RevokedTokenModel(db.Model):

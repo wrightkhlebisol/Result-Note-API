@@ -1,13 +1,21 @@
 from app import ma
-from app.models import Users, Posts, Comments, Tasks
+from app.models import Users, Tasks, Schools, Classes, Subjects, Scores
+from enum import Enum
 
 from marshmallow import Schema, fields
 
+class UsersEnum(Enum):
+    SUPER_ADMIN = "super_admin"
+    ADMIN = "admin"
+    STUDENT = "student"
+    TEACHER = "teacher"
+    PARENT = "parent"
+    OTHERS = "others"
 
+    
 class UsersSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Users
-
 
 class UsersDeserializingSchema(Schema):
     username = fields.String()
@@ -16,26 +24,44 @@ class UsersDeserializingSchema(Schema):
     last_name = fields.String()
     email = fields.Email()
     birthday = fields.Date()
+    role = fields.Enum(UsersEnum)
 
 
-class PostsSchema(ma.SQLAlchemyAutoSchema):
+class SchoolsSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Posts
+        model = Schools
 
 
-class PostsDeserializingSchema(Schema):
-    body = fields.String()
+class SchoolsDeserializingSchema(Schema):
+    name = fields.String()
+    location = fields.String()
+    color = fields.String()
 
 
-class CommentsSchema(ma.SQLAlchemyAutoSchema):
+class ClassesSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Comments
+        model = Classes
 
 
-class CommentsDeserializingSchema(Schema):
-    body = fields.String()
-    post_id = fields.Integer()
+class ClassesDeserializingSchema(Schema):
+    name = fields.String()
+    
 
+class SubjectsSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Subjects
+
+
+class SubjectsDeserializingSchema(Schema):
+    name = fields.String()
+
+
+class ScoresSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Scores
+        
+class ScoresDeserializingSchema(Schema):
+    score = fields.Integer()
 
 class TasksSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
