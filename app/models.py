@@ -30,16 +30,14 @@ def user_loader_callback(jwt_header: dict, jwt_data: dict) -> object:
 # defines the Users database table
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
+    role = db.Column(db.Enum('super_admin', 'admin', 'student', 'teacher', 'parent', 'others'), nullable=False)
     birthday = db.Column(db.DateTime, nullable=False)
     join_date = db.Column(db.DateTime, default=datetime.utcnow)
-    posts = db.relationship("Posts", backref="user", lazy="dynamic")
-    comments = db.relationship("Comments", backref="user", lazy="dynamic")
-    tasks = db.relationship("Tasks", backref="user", lazy="dynamic")
+
 
     def set_password(self, password: str):
         """
@@ -68,7 +66,7 @@ class Users(db.Model):
             Returns True if the password is a match. If not False is returned
         """
         return check_password_hash(self.password_hash, password)
-
+    
     def launch_task(self, name: str, description: str, **kwargs) -> object:
         """
         Helper function to launch a background task
@@ -134,20 +132,38 @@ class Users(db.Model):
         return Tasks.query.filter_by(user=self, complete=True).all()
 
 
-class Posts(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    comments = db.relationship("Comments", backref="post", lazy="dynamic")
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+# class Schools(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     admin = db.Column(db.Integer, db.ForeignKey("users.id"))
+#     name = db.Column(db.String(100), nullable=False)
+#     location = db.Column(db.String(100), nullable=False)
+#     students = db.relationship("Users", backref="school", lazy="dynamic")
+       
+    
+# class Classes(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(100), nullable=False)
+#     school_id = db.Column(db.Integer, db.ForeignKey("schools.id"))
+#     subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"))
+#     teacher_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+#     teacher = db.relationship("Users", backref="class", lazy="dynamic")
+ 
+    
+# class Subjects(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(100), nullable=False)
+ 
 
 
-class Comments(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+# class Scores(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     student_id = db.Column(db.Integer, db.ForeignKey("students.id"), on_delete="CASCADE")
+#     subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"))
+#     score = db.Column(db.Integer, nullable=False)
+#     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+#     student = db.relationship("Students", backref="score", lazy="dynamic")
+#     subject = db.relationship("Subjects", backref="score", lazy="dynamic")
 
 
 class RevokedTokenModel(db.Model):
