@@ -11,7 +11,7 @@ user_schema = UsersSchema(exclude=("email", "password_hash"))
 users_schema = UsersSchema(many=True, exclude=("email", "password_hash"))
 
 
-@bp.get("/get/user/profile")
+@bp.get("/profile")
 @jwt_required()
 def user_page() -> tuple[Response, int] | str:
     """
@@ -25,23 +25,23 @@ def user_page() -> tuple[Response, int] | str:
     return user_schema.jsonify(current_user), 200
 
 
-@bp.get("/get/user/profile/<string:username>")
+@bp.get("/profile/<int:id>")
 @jwt_required()
-def get_user(username: str) -> tuple[Response, int] | Response:
+def get_user(id: int) -> tuple[Response, int] | Response:
     """
     Lets users retrieve a user profile when logged in
 
     Parameters
     ----------
-    username : str
-        The username of the user who's information should be retrieved
+    id : str
+        The id of the user who's information should be retrieved
 
     Returns
     -------
     str
         A JSON object containing the user profile information
     """
-    user = Users.query.filter_by(username=username).first()
+    user = Users.query.filter_by(id=id).first()
 
     if user is None:
         return bad_request("User not found")
