@@ -28,7 +28,7 @@ class TestUsers(unittest.TestCase):
             setup_access_token = register_and_login_test_user(c)
 
             resp = c.get(
-                "/api/users/get/user/profile",
+                "/api/users/profile",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
             )
 
@@ -41,7 +41,7 @@ class TestUsers(unittest.TestCase):
             setup_access_token = register_and_login_test_user(c)
 
             resp = c.get(
-                "/api/users/get/user/profile/test",
+                "/api/users/profile/test",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
             )
 

@@ -30,13 +30,13 @@ class TestPosts(unittest.TestCase):
             payload = {"body": "This is a test post"}
 
             resp = c.post(
-                "/api/posts/post/user/submit/post",
+                "/api/posts/post/submit/post",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
                 json=payload,
             )
 
             resp = c.get(
-                "api/posts/get/user/posts",
+                "api/posts/posts",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
             )
 
@@ -51,13 +51,13 @@ class TestPosts(unittest.TestCase):
             payload = {"body": "This is a test post"}
 
             c.post(
-                "/api/posts/post/user/submit/post",
+                "/api/posts/post/submit/post",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
                 json=payload,
             )
 
             resp = c.get(
-                "/api/posts/get/user/post/1",
+                "/api/posts/post/1",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
             )
 
@@ -72,7 +72,7 @@ class TestPosts(unittest.TestCase):
             payload = {"body": "This is a test post"}
 
             resp = c.post(
-                "/api/posts/post/user/submit/post",
+                "/api/posts/post/submit/post",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
                 json=payload,
             )
@@ -88,13 +88,13 @@ class TestPosts(unittest.TestCase):
             payload = {"body": "This is a test post"}
 
             resp = c.post(
-                "/api/posts/post/user/submit/post",
+                "/api/posts/post/submit/post",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
                 json=payload,
             )
 
             resp = c.delete(
-                "/api/posts/delete/user/post/1",
+                "/api/posts/delete/post/1",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
             )
 
@@ -107,7 +107,7 @@ class TestPosts(unittest.TestCase):
             setup_access_token = register_and_login_test_user(c)
 
             resp = c.get(
-                "/api/posts/get/user/posts/async",
+                "/api/posts/posts/async",
                 headers={"Authorization": "Bearer {}".format(setup_access_token)},
             )
 
