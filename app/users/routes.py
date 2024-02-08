@@ -10,6 +10,20 @@ from app.users import bp
 user_schema = UsersSchema(exclude=("email", "password_hash"))
 users_schema = UsersSchema(many=True, exclude=("email", "password_hash"))
 
+@bp.route("/")
+@jwt_required()
+def get_all_users() -> tuple[Response, int]:
+    """
+    Returns all users in the database
+
+    Returns
+    -------
+    JSON
+        A JSON object containing all user data
+    """
+    users = Users.query.all()
+
+    return users_schema.jsonify(users), 200
 
 @bp.get("/profile")
 @jwt_required()
@@ -44,6 +58,6 @@ def get_user(id: int) -> tuple[Response, int] | Response:
     user = Users.query.filter_by(id=id).first()
 
     if user is None:
-        return bad_request("User not found")
+        return bad_request("User not found"), 404
 
     return user_schema.jsonify(user), 200
