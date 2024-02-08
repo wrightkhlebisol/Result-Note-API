@@ -30,7 +30,7 @@ Jinja2==3.1.2
 limits==3.4.0
 Mako==1.2.4
 markdown-it-py==2.2.0
-MarkupSafe==2.1.2
+MarkupSafe==2.1.5
 marshmallow==3.19.0
 marshmallow-sqlalchemy==0.29.0
 mccabe==0.7.0
