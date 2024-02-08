@@ -66,7 +66,8 @@ def register() -> tuple[Response, int] | Response:
         last_name=result["last_name"],
         email=result["email"],
         birthday=result["birthday"],
-        role = result["role"].value
+        role = result["role"].value,
+        phone=result["phone"],
     )
 
     user.set_password(result["password"])
