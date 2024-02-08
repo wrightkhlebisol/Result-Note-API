@@ -1,7 +1,7 @@
 **/__pycache__/
 venv/
 logs/
-migrations/
 app.db
 .env
 *.http
+todo.md
