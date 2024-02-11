@@ -31,11 +31,11 @@ class UsersSchema(ma.SQLAlchemyAutoSchema):
         model = Users
 
 class UsersDeserializingSchema(Schema):
+    first_name = fields.String()
+    last_name = fields.String()
     email = fields.Email()
     phone = fields.String()
     password = fields.String()
-    first_name = fields.String()
-    last_name = fields.String()
     birthday = fields.Date()
     role = fields.Enum(UsersEnum)
 
