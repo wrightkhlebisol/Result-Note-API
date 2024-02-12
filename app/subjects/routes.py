@@ -42,7 +42,7 @@ def submit_subject() -> tuple[Response, int] | Response:
     db.session.add(subject)
     db.session.commit()
     
-    return jsonify({'msg': 'created'}), 201
+    return jsonify({'msg': 'Subject created successfully'}), 201
 
 
 @bp.get("/")
