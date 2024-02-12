@@ -5,25 +5,25 @@ from enum import Enum
 from marshmallow import Schema, fields
 
 class UsersEnum(Enum):
-    SUPER_ADMIN = "super_admin"
-    ADMIN = "admin"
-    STUDENT = "student"
-    TEACHER = "teacher"
-    PARENT = "parent"
-    OTHERS = "others"
+    super_admin = "super_admin"
+    admin = "admin"
+    student = "student"
+    teacher = "teacher"
+    parent = "parent"
+    others = "others"
     
 class TermEnum(Enum):
-    FIRST = "first"
-    SECOND = "second"
-    THIRD = "third"
+    first = "first"
+    second = "second"
+    third = "third"
     
 class TypeEnum(Enum):
     CA = "CA"
-    EXAM = "exam"
-    TEST = "test"
-    ASSIGNMENT = "assignment"
-    PROJECT = "project"
-    OTHERS = "others"
+    exam = "exam"
+    test = "test"
+    assignment = "assignment"
+    project = "project"
+    others = "others"
 
     
 class UsersSchema(ma.SQLAlchemyAutoSchema):
