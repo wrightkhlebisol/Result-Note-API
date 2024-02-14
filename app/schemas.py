@@ -1,5 +1,5 @@
 from app import ma
-from app.models import Users, Tasks, Schools, Classes, Subjects, Scores
+from app.models import Users, Tasks, Schools, Classes, Subjects, Scores, Reports
 from enum import Enum
 
 from marshmallow import Schema, fields
@@ -88,6 +88,9 @@ class ScoresDeserializingSchema(Schema):
     session = fields.String()
     type = fields.Enum(TypeEnum)
     
+class ReportsSchema(ma.SQLAlchemyAutoSchema):
+    class Meta(Schema):
+        model = Reports
 
 class TasksSchema(ma.SQLAlchemyAutoSchema):
     class Meta:

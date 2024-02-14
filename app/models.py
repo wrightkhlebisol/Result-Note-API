@@ -35,7 +35,7 @@ class Users(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), unique=False, nullable=False)
-    role = db.Column(db.Enum('super_admin', 'admin', 'student', 'teacher', 'parent', 'others'), nullable=False)
+    role = db.Column(db.Enum('super_admin', 'admin', 'student', 'teacher', 'parent', 'others'), nullable=False, default="others")
     birthday = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -142,8 +142,8 @@ class Schools(db.Model):
     phone = db.Column(db.String(20), nullable=False, unique=True)
     email = db.Column(db.String(250), nullable=False, unique=True)
     color = db.Column(db.String(100), default="blue")
-    logo = db.Column(db.String(100), nullable=True)
-    motto = db.Column(db.String(100), nullable=True)
+    logo = db.Column(db.String(100), nullable=True, default="default.png")
+    motto = db.Column(db.String(100), nullable=True, default="Education for all")
     city = db.Column(db.String(100), nullable=False, default="Lagos")
     state = db.Column(db.String(100), nullable=False, default="Lagos")
     country = db.Column(db.String(100), default="Nigeria")
@@ -154,7 +154,7 @@ class Schools(db.Model):
 # defines the Students database table
 class Classes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -163,7 +163,7 @@ class Classes(db.Model):
 # defines the Subjects database table
 class Subjects(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -174,11 +174,26 @@ class Scores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer, nullable=False)
     term = db.Column(db.Enum('first', 'second', 'third'), nullable=False)
+    # class_id = db.Column(db.Integer, db.ForeignKey("classes.id"))
+    # subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"))
+    # student_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     session = db.Column(db.String(100), nullable=False)
     type = db.Column(db.Enum('CA', 'exam', 'test', 'assignment', 'project', 'others'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class Reports(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(150), nullable=False)
+    term = db.Column(db.Enum('first', 'second', 'third'), nullable=False)
+    # # student_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    # # generated_by = db.Column(db.Integer, db.Foreignkey("users.id"))
+    session = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    
 
 class RevokedTokenModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
