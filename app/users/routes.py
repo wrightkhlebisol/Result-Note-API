@@ -118,10 +118,7 @@ def update_user(id: int) -> tuple[Response, int] | Response:
         return bad_request(e.messages), 400
 
     for k, v in result.items():
-        if k == "birthday":
-            setattr(user, k, v.date())
-        else:
-            setattr(user, k, v)
+        setattr(user, k, v)
 
     db.session.commit()
 

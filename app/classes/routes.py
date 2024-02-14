@@ -107,7 +107,7 @@ def update_class(id: int) -> tuple[Response, int] | Response:
         A JSON object containing a success message
     """
     try:
-        result = class_schema.load(request.get_json())
+        result = class_schema.load(request.get_json(), partial=True)
     except ValidationError as e:
         return bad_request(e.messages), 400
 
@@ -116,9 +116,9 @@ def update_class(id: int) -> tuple[Response, int] | Response:
     if not classes:
         return bad_request("Class not found"), 404
 
-    classes.name = result["name"]
-    classes.description = result["description"]
-
+    for k, v in result.items():
+        setattr(classes, k, v)
+        
     db.session.commit()
 
     return jsonify({"msg": "Class updated successfully"}), 201
@@ -151,89 +151,6 @@ def delete_class(id: int) -> tuple[Response, int] | Response:
     db.session.commit()
     
     return jsonify({"msg": "Class deleted successfully"}), 201
-
-
-# @bp.get("/get/user/classes/post/<int:id>")
-# @jwt_required()
-# def get_classes_by_post_id(id: int) -> Response:
-#     """
-#     Endpoint for retrieving the user classes associated with a particular post
-
-#     Parameters
-#     ----------
-#     id : int
-#         ID of the post which class's need to be retrieved
-
-#     Returns
-#     -------
-#     str
-#         A JSON object containing the classes
-#     """
-#     classes = Classes.query.filter_by(post_id=id).all()
-#     return classes_schema.jsonify(classes)
-
-
-# @bp.post("/post/user/submit/class")
-# @jwt_required()
-# def submit_class() -> tuple[Response, int] | Response:
-#     """
-#     Lets users submit a class regarding a post
-
-#     Returns
-#     -------
-#     str
-#         A JSON object containing a success message
-#     """
-#     try:
-#         result = class_deserializing_schema.load(request.get_json())
-#     except ValidationError as e:
-#         return bad_request(e.messages)
-
-#     post = Posts.query.get(result["post_id"])
-
-#     if not post:
-#         return bad_request("Post not found")
-
-#     if post.user_id != current_user.id:
-#         return bad_request("Unauthorized")
-
-#     classes = Classes(body=result["body"], post=post, user=current_user)
-
-#     db.session.add(classes)
-#     db.session.commit()
-
-#     return jsonify({"msg": "Comment succesfully submitted"}), 201
-
-
-# @bp.delete("/delete/user/class/<int:id>")
-# @jwt_required()
-# def delete_class(id: int) -> tuple[Response, int] | Response:
-#     """
-#     Lets users delete one of their own classes
-
-#     Parameters
-#     ----------
-#     id : int
-#         ID of the post which class's need to be retrieved
-
-#     Returns
-#     -------
-#     str
-#         A JSON object containing a success message
-#     """
-#     classes = Classes.query.get(id)
-
-#     if not classes:
-#         return bad_request("Comment not found")
-
-#     if classes.user_id != current_user.id:
-#         return bad_request("Unauthorized")
-
-#     db.session.delete(classes)
-#     db.session.commit()
-
-#     return jsonify({"msg": "Comment succesfully deleted"}), 201
-
 
 # @bp.get("/get/user/classes/async")
 # @jwt_required()
