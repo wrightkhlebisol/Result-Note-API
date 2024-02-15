@@ -46,7 +46,7 @@ platformdirs==3.4.0
 pycodestyle==2.10.0
 pyflakes==3.0.1
 Pygments==2.15.1
-PyJWT==2.6.0
+PyJWT==2.8.0
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 python-editor==1.0.4
