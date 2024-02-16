@@ -1,10 +1,10 @@
 from app import db, jwt
 from flask import current_app
+from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import redis
 import rq
-
 
 @jwt.user_lookup_loader
 def user_loader_callback(jwt_header: dict, jwt_data: dict) -> object:
@@ -27,6 +27,19 @@ def user_loader_callback(jwt_header: dict, jwt_data: dict) -> object:
     return Users.query.filter_by(id=jwt_data["sub"]).first()
 
 
+student_reports = db.Table(
+    "student_reports",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("report_id", db.Integer, db.ForeignKey("reports.id")),
+)
+
+users_subjects = db.Table(
+    "users_subjects",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("subject_id", db.Integer, db.ForeignKey("subjects.id")),
+)
+
+
 # defines the Users database table
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,6 +52,11 @@ class Users(db.Model):
     birthday = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    schools = relationship("Schools", back_populates="owner", lazy=True, cascade="all, delete")
+    reports = relationship("Reports", back_populates="students", secondary=student_reports, cascade="all, delete")
+    subjects = relationship("Subjects", back_populates="students", secondary=users_subjects, cascade="all, delete")
+    scores = relationship("Scores", back_populates="students", lazy=True)
 
 
     def set_password(self, password: str):
@@ -89,7 +107,10 @@ class Users(db.Model):
             "app.tasks.long_running_jobs" + name, **kwargs
         )
         task = Tasks(
-            task_id=rq_job.get_id(), name=name, description=description, user=self
+            task_id=rq_job.get_id(), 
+            name=name, 
+            description=description, 
+            user=self
         )
         db.session.add(task)
 
@@ -149,7 +170,10 @@ class Schools(db.Model):
     country = db.Column(db.String(100), default="Nigeria")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-       
+
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    owner = relationship("Users", back_populates="schools", lazy=True, cascade="all, delete")
+
     
 # defines the Students database table
 class Classes(db.Model):
@@ -158,7 +182,10 @@ class Classes(db.Model):
     description = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    
+    subjects = relationship("Subjects", back_populates="classes", lazy=True)
+    scores = relationship("Scores", back_populates="classes", lazy=True)
+    
 
 # defines the Subjects database table
 class Subjects(db.Model):
@@ -167,32 +194,47 @@ class Subjects(db.Model):
     description = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
- 
+    
+    class_id = db.Column(db.Integer, db.ForeignKey("classes.id"), nullable=True)
+    
+    classes = relationship("Classes", back_populates="subjects", lazy=True)
+    students = relationship("Users", back_populates="subjects", lazy=True, cascade="all, delete", secondary=users_subjects)
+    scores = relationship("Scores", back_populates="subjects", lazy=True)
+
 
 # defines the Scores database table
 class Scores(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer, nullable=False)
     term = db.Column(db.Enum('first', 'second', 'third'), nullable=False)
-    # class_id = db.Column(db.Integer, db.ForeignKey("classes.id"))
-    # subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"))
-    # student_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     session = db.Column(db.String(100), nullable=False)
     type = db.Column(db.Enum('CA', 'exam', 'test', 'assignment', 'project', 'others'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    
+    class_id = db.Column(db.Integer, db.ForeignKey("classes.id"), primary_key=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey("subjects.id"), primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    
+    classes = relationship("Classes", back_populates="scores", lazy=True)
+    subjects = relationship("Subjects", back_populates="scores", lazy=True)
+    students = relationship("Users", back_populates="scores", lazy=True)
+    
+    
 class Reports(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(150), nullable=False)
     term = db.Column(db.Enum('first', 'second', 'third'), nullable=False)
-    # # student_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    # # generated_by = db.Column(db.Integer, db.Foreignkey("users.id"))
     session = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    student_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    generator_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    
+    students = relationship("Users", back_populates="reports", lazy=True, secondary=student_reports, cascade="all, delete")
+    # generator = relationship("Users", lazy=True, cascade="all, delete")
     
 
 class RevokedTokenModel(db.Model):
