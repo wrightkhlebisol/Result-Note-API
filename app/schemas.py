@@ -25,7 +25,6 @@ class TypeEnum(Enum):
     project = "project"
     others = "others"
 
-    
 class UsersSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Users
@@ -39,11 +38,9 @@ class UsersDeserializingSchema(Schema):
     birthday = fields.Date()
     role = fields.Enum(UsersEnum)
 
-
 class SchoolsSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Schools
-
 
 class SchoolsDeserializingSchema(Schema):
     name = fields.String()
@@ -57,30 +54,31 @@ class SchoolsDeserializingSchema(Schema):
     country = fields.String()
     color = fields.String()
 
-
 class ClassesSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Classes
 
-
 class ClassesDeserializingSchema(Schema):
     name = fields.String()
     description = fields.String()
-    
 
 class SubjectsSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Subjects
 
-
 class SubjectsDeserializingSchema(Schema):
     name = fields.String()
     description = fields.String()
 
-
 class ScoresSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Scores
+        include_relationships = True
+        load_instance = True
+
+    class_id = fields.Nested(ClassesSchema)
+    subject_id = fields.Nested(SubjectsSchema)
+    student_id = fields.Nested(UsersSchema)
         
 class ScoresDeserializingSchema(Schema):
     score = fields.Integer()
