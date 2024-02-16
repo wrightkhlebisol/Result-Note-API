@@ -5,6 +5,7 @@ from app.schemas import SchoolsDeserializingSchema, SchoolsSchema
 from app.schools import bp
 from flask import request, jsonify, Response
 from flask_jwt_extended import jwt_required, current_user
+from sqlalchemy.orm import joinedload
 
 school_schema = SchoolsSchema()
 schools_schema = SchoolsSchema(many=True)
@@ -39,6 +40,8 @@ def create_school() -> tuple[Response, int] | Response:
         country = result["country"]
     )
     
+    school.owner = current_user
+    
     db.session.add(school)
     db.session.commit()
     return jsonify({"msg": "School created successfully"}), 201
@@ -56,7 +59,9 @@ def get_all_schools() -> Response:
         A JSON object containing the schools
     """
     try:
-        schools = Schools.query.all()
+        schools = Schools.query.options(joinedload(Schools.owner)).all()
+        for school in schools:
+            print(school.owner)
     except Exception as e:
         return bad_request(e.messages)
     
@@ -80,13 +85,17 @@ def get_school_by_id(id: int) -> Response:
         A JSON object containing the school
     """
     try:
-        school = Schools.query.get(id)
+        school = Schools.query.options(joinedload(Schools.owner)).get(id)
     except Exception as e:
         return bad_request(e.messages)
-    
+
     if not school:
         return bad_request("School not found"), 404
-    
+
+    print(school_schema.dump(school))
+    # school_detes["owner"] = school_schema.dump(school.owner)
+    # school_detes["school"] = school_schema.dump(school)
+
     return school_schema.jsonify(school)
 
 
@@ -112,7 +121,7 @@ def update_school(id: int) -> tuple[Response, int] | Response:
         return bad_request("School not found"), 404
 
     try:
-        data = school_deserializing_schema.dumps(school)
+        data = school_deserializing_schema.load(request.json)
     except Exception as e:
         return bad_request(e.messages)
     
@@ -146,3 +155,32 @@ def delete_school(id: int) -> tuple[Response, int] | Response:
     db.session.delete(school)
     db.session.commit()
     return jsonify({"msg": "School deleted successfully"}), 200
+
+
+@bp.put("/<int:id>/admin/<int:user_id>")
+@jwt_required()
+def update_school_owner(id: int, user_id: int) -> tuple[Response, int] | Response:
+    """
+    Lets users update the admin of a school
+
+    Parameters
+    ----------
+    id : int
+        ID of the school to be updated
+
+    Returns
+    -------
+    str
+        A JSON object containing a success message
+    """
+    school = Schools.query.get(id)
+    if not school:
+        return bad_request("School not found"), 404
+    
+    user = Users.query.get(user_id)
+    if not user:
+        return bad_request("User not found"), 404
+
+    school.owner = user
+    db.session.commit()
+    return jsonify({"msg": "School owner updated successfully"}), 200
