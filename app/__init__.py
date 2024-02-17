@@ -57,6 +57,7 @@ def create_app(config_class=Config):
 
     from app.auth import bp as auth_bp
     from app.classes import bp as classes_bp
+    from app.dashboard import bp as dashboard_bp
     from app.errors import bp as errors_bp
     from app.reports import bp as reports_bp
     from app.schools import bp as schools_bp
@@ -67,6 +68,7 @@ def create_app(config_class=Config):
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(errors_bp)
+    app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
     app.register_blueprint(classes_bp, url_prefix="/api/classes")
     app.register_blueprint(reports_bp, url_prefix="/api/reports")
     app.register_blueprint(schools_bp, url_prefix="/api/schools")
@@ -76,7 +78,7 @@ def create_app(config_class=Config):
     app.register_blueprint(users_bp, url_prefix="/api/users")
 
     # Set the rate limit for all routes in the auth_bp blueprint to 1 per second
-    limiter.limit("1 per minute")(auth_bp)
+    limiter.limit("60 per minute")(auth_bp)
 
     # Set the debuging to rotating log files and the log format and settings
     if not app.debug:
