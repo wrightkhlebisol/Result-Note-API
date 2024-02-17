@@ -35,8 +35,44 @@ student_reports = db.Table(
 
 users_subjects = db.Table(
     "users_subjects",
-    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
-    db.Column("subject_id", db.Integer, db.ForeignKey("subjects.id")),
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("subject_id", db.Integer, db.ForeignKey("subjects.id"), primary_key=True),
+)
+
+school_students = db.Table(
+    "school_students",
+    db.Column("student_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("school_id", db.Integer, db.ForeignKey("schools.id"), primary_key=True),
+)
+
+school_teachers = db.Table(
+    "school_teachers",
+    db.Column("teacher_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("school_id", db.Integer, db.ForeignKey("schools.id"), primary_key=True)
+)
+
+schools_subjects = db.Table(
+    "schools_subjects",
+    db.Column("school_id", db.Integer, db.ForeignKey("schools.id"), primary_key=True),
+    db.Column("subject_id", db.Integer, db.ForeignKey("subjects.id"), primary_key=True)
+)
+
+school_classes = db.Table(
+    "school_classes",
+    db.Column("school_id", db.Integer, db.ForeignKey("schools.id"), primary_key=True),
+    db.Column("class_id", db.Integer, db.ForeignKey("classes.id"), primary_key=True)
+)
+
+class_subjects = db.Table(
+    "class_subjects",
+    db.Column("subject_id", db.Integer, db.ForeignKey("subjects.id"), primary_key=True),
+    db.Column("class_id", db.Integer, db.ForeignKey("classes.id"), primary_key=True)
+)
+
+students_classes = db.Table(
+    "students_classes",
+    db.Column("student_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("class_id", db.Integer, db.ForeignKey("classes.id"), primary_key=True)
 )
 
 
@@ -57,6 +93,9 @@ class Users(db.Model):
     reports = relationship("Reports", back_populates="students", secondary=student_reports, cascade="all, delete")
     subjects = relationship("Subjects", back_populates="students", secondary=users_subjects, cascade="all, delete")
     scores = relationship("Scores", back_populates="students", lazy=True)
+    school = relationship("Schools", back_populates="students", secondary=school_students, lazy=True, cascade="all, delete")
+    school_teachers = relationship("Schools", back_populates="teachers", secondary=school_teachers, lazy=True, cascade="all, delete")
+    classes = relationship("Classes", back_populates="students", secondary=students_classes, lazy=True, cascade="all, delete")
 
 
     def set_password(self, password: str):
@@ -174,6 +213,11 @@ class Schools(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     owner = relationship("Users", back_populates="schools", lazy=True, cascade="all, delete")
 
+    students = relationship("Users", back_populates="school", secondary=school_students, lazy=True, cascade="all, delete")
+    teachers = relationship("Users", back_populates="school_teachers", secondary=school_teachers, lazy=True, cascade="all, delete")
+    subjects = relationship("Subjects", back_populates="schools", secondary=schools_subjects, lazy=True, cascade="all, delete")
+    classes = relationship("Classes", back_populates="schools", secondary=school_classes, lazy=True, cascade="all, delete")
+
     
 # defines the Students database table
 class Classes(db.Model):
@@ -183,8 +227,10 @@ class Classes(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    subjects = relationship("Subjects", back_populates="classes", lazy=True)
+    subjects = relationship("Subjects", back_populates="classes", secondary=class_subjects, lazy=True, cascade="all, delete")
     scores = relationship("Scores", back_populates="classes", lazy=True)
+    schools = relationship("Schools", back_populates="classes", lazy=True, secondary=school_classes, cascade="all, delete")
+    students = relationship("Users", back_populates="classes", secondary=students_classes, lazy=True, cascade="all, delete")
     
 
 # defines the Subjects database table
@@ -194,13 +240,12 @@ class Subjects(db.Model):
     description = db.Column(db.String(250), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    class_id = db.Column(db.Integer, db.ForeignKey("classes.id"), nullable=True)
-    
-    classes = relationship("Classes", back_populates="subjects", lazy=True)
+        
+    classes = relationship("Classes", back_populates="subjects", secondary=class_subjects, lazy=True, cascade="all, delete")
     students = relationship("Users", back_populates="subjects", lazy=True, cascade="all, delete", secondary=users_subjects)
     scores = relationship("Scores", back_populates="subjects", lazy=True)
-
+    schools = relationship("Schools", back_populates="subjects", lazy=True, secondary=schools_subjects, cascade="all, delete")
+    
 
 # defines the Scores database table
 class Scores(db.Model):
