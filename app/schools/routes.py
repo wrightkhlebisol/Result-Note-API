@@ -180,6 +180,9 @@ def update_school_owner(id: int, user_id: int) -> tuple[Response, int] | Respons
     user = Users.query.get(user_id)
     if not user:
         return bad_request("User not found"), 404
+    
+    if user.role != "admin":
+        return bad_request("User is not an admin"), 400
 
     school.owner = user
     db.session.commit()
