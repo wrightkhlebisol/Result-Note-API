@@ -58,18 +58,16 @@ def register() -> tuple[Response, int] | Response:
     except ValidationError as e:
         return bad_request(e.messages)
 
-    if Users.query.filter_by(username=result["username"]).first():
-        return bad_request("Username already in use")
-
     if Users.query.filter_by(email=result["email"]).first():
         return bad_request("Email already in use")
 
     user: Users = Users(
-        username=result["username"],
         first_name=result["first_name"],
         last_name=result["last_name"],
         email=result["email"],
         birthday=result["birthday"],
+        role = result["role"].value,
+        phone=result["phone"],
     )
 
     user.set_password(result["password"])
@@ -96,10 +94,10 @@ def login() -> tuple[Response, int] | Response:
     except ValidationError as e:
         return bad_request(e.messages)
 
-    user = Users.query.filter_by(username=result["username"]).first()
+    user = Users.query.filter_by(email=result["email"]).first()
 
     if user is None or not user.check_password(result["password"]):
-        return error_response(401, message="Invalid username or password")
+        return error_response(401, message="Invalid email or password")
 
     tokens = {
         "access_token": create_access_token(identity=user.id, fresh=True),
@@ -144,10 +142,10 @@ def fresh_login() -> tuple[Response, int] | Response:
     except ValidationError as e:
         return bad_request(e.messages)
 
-    user = Users.query.filter_by(username=result["username"]).first()
+    user = Users.query.filter_by(email=result["email"]).first()
 
     if user is None or not user.check_password(result["password"]):
-        return error_response(401, message="Invalid username or password")
+        return error_response(401, message="Invalid email or password")
 
     new_token = create_access_token(identity=user.id, fresh=True)
     payload = {"access_token": new_token}
